@@ -40,14 +40,14 @@ uvicorn main:app --reload
 
 ## Available API's endpoints
 
-| Método | Rota              | Descrição                                               |
+| Method | Route              | Description                                               |
 |--------|-------------------|---------------------------------------------------------|
 | `POST` | `/evaluate`       | Evaluate rules to a certain machine endpoint           |
 | `GET`  | `/rules`          | List current rules                                     |
 | `POST` | `/rules`          | Add new rule in execution time                         |
 
 
-## 📄 Estrutura do projeto
+## 📄 Project Structure
 
 ```
 BRE-study/
