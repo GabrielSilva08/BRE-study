@@ -11,7 +11,7 @@ class Rule(Base):
     __tablename__ = "rules"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True)
-    rule_json = Column(Text) # Armazena a regra em formato JSON
+    rule_json = Column(Text) # store rules in JSON format
 
 # Representation of an user's system
 class DataEndpoint(BaseModel):

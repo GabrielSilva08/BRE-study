@@ -3,11 +3,16 @@ from fastapi import FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from models import Rule, DataEndpoint, RuleInput
 from rules_engine import evaluate_rule
-from database import engine, SessionLocal, init_db
+from database import SessionLocal, populate_initial_rules, cleanup_rules_on_shutdown
+from contextlib import asynccontextmanager
 
-init_db()
+# Application lifespan behavior (startup/shutdown)
+async def lifespan(app: FastAPI):
+    populate_initial_rules()
+    yield
+    cleanup_rules_on_shutdown()
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 # Endpoint to evaluate a system with respect to a certain rule (rule_id)
 @app.post("/evaluate/{rule_id}")
@@ -25,7 +30,7 @@ def evaluate(rule_id: int, endpoint: DataEndpoint):
 @app.post("/rules")
 def create_rule(rule_input: RuleInput):
     db: Session = SessionLocal()
-    rule = Rule(rule_json=json.dumps(rule_input.rule_json))
+    rule = Rule(rule_json=json.dumps(rule_input.rule_json), name="Regra Manual")
     db.add(rule)
     db.commit()
     db.refresh(rule)
@@ -36,7 +41,4 @@ def create_rule(rule_input: RuleInput):
 def list_rules():
     db: Session = SessionLocal()
     rules = db.query(Rule).all()
-    return [
-        {"id": rule.id, "rule_json": json.loads(rule.rule_json)}
-        for rule in rules
-    ]
+    return [{"id": rule.id, "rule_json": json.loads(rule.rule_json)} for rule in rules]
