@@ -14,6 +14,27 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Endpoint to evaluate a machine against all stored rules
+@app.post("/evaluate_all")
+def evaluate_all(endpoint: DataEndpoint):
+    db: Session = SessionLocal()
+    rules = db.query(Rule).all()
+
+    if not rules:
+        raise HTTPException(status_code=404, detail="Nenhuma regra cadastrada")
+
+    results = []
+    for rule in rules:
+        rule_json = json.loads(rule.rule_json)
+        result, triggered = evaluate_rule(rule_json, endpoint)
+        results.append({
+            "rule_name": rule.name,
+            "activated": result,
+            "triggered_action": triggered if triggered else None
+        })
+
+    return {"evaluations": results}
+
 # Endpoint to evaluate a system with respect to a certain rule (rule_id)
 @app.post("/evaluate/{rule_id}")
 def evaluate(rule_id: int, endpoint: DataEndpoint):
