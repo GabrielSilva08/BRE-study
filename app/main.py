@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from sqlalchemy.orm import Session
 from models import Rule, DataEndpoint, RuleInput
 from rules_engine import evaluate_rule
@@ -46,3 +46,29 @@ def list_rules():
     db: Session = SessionLocal()
     rules = db.query(Rule).all()
     return [{"id": rule.id, "rule_json": json.loads(rule.rule_json)} for rule in rules]
+
+# Endpoint to update a rule by its name
+@app.put("/rules/{rule_name}")
+def update_rule(rule_name: str, updated_rule: RuleInput = Body(...)):
+    db: Session = SessionLocal()
+    rule = db.query(Rule).filter(Rule.name == rule_name).first()
+
+    if not rule:
+        raise HTTPException(status_code=404, detail="Regra não encontrada")
+
+    rule.rule_json = json.dumps(updated_rule.rule_json)
+    db.commit()
+    return {"message": f"Regra '{rule_name}' atualizada com sucesso"}
+
+# Endpoint to delete a rule by its name
+@app.delete("/rules/{rule_name}")
+def delete_rule(rule_name: str):
+    db: Session = SessionLocal()
+    rule = db.query(Rule).filter(Rule.name == rule_name).first()
+
+    if not rule:
+        raise HTTPException(status_code=404, detail="Regra não encontrada")
+
+    db.delete(rule)
+    db.commit()
+    return {"message": f"Regra '{rule_name}' removida com sucesso"}
