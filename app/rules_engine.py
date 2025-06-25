@@ -16,7 +16,7 @@ class InputVariables(BaseVariables):
     
     @numeric_rule_variable
     def days_since_last_access(self) -> int:
-        return (datetime.now() - self.endpoint.last_acess).days
+        return (datetime.now() - self.endpoint.last_access).days
 
 # Define the actions to be executed if some is triggered
 class OutputActions(BaseActions):
@@ -41,5 +41,11 @@ class OutputActions(BaseActions):
 def evaluate_rule(rule_json, data_endpoint):
     variables = InputVariables(data_endpoint)
     actions = OutputActions(data_endpoint.endpoint_identifier)
-    result = run_all(rule_list=rule_json, defined_variables=variables, defined_actions=actions)
-    return result, actions.triggered_actions
+
+    result = run_all(rule_list=[rule_json], defined_variables=variables, defined_actions=actions)
+
+    triggered_action = None
+    if actions.triggered_actions:
+        triggered_action = rule_json["actions"][0]["name"]
+
+    return result, triggered_action

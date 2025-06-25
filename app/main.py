@@ -22,9 +22,13 @@ def evaluate(rule_id: int, endpoint: DataEndpoint):
     if not rule:
         raise HTTPException(status_code=404, detail="Regra não encontrada")
     
-    rule_json = json.loads(rule.rule_json)
+    try:
+        rule_json = json.loads(rule.rule_json)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Regra corrompida ou inválida")
+
     result, triggered = evaluate_rule(rule_json, endpoint)
-    return {"result": result, "triggered_action": triggered}
+    return {"endpoint": endpoint.endpoint_identifier, "result": result, "triggered_action": triggered}
 
 # Endpoint to create a new rule
 @app.post("/rules")
