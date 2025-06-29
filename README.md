@@ -15,7 +15,7 @@ Just an application of study in the BRE `business-rules` library.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/seu-usuario/BRE-study.git
+git clone https://github.com/your-user/BRE-study.git
 cd BRE-study
 ```
 
@@ -23,7 +23,7 @@ cd BRE-study
 
 ```bash
 python -m venv venv
-venv\Scripts\activate no Windows
+venv\Scripts\activate
 ```
 
 3. Install the dependencies:
@@ -40,21 +40,24 @@ uvicorn main:app --reload
 
 ## Available API's endpoints
 
-| Method | Route              | Description                                               |
-|--------|-------------------|---------------------------------------------------------|
-| `POST` | `/evaluate`       | Evaluate rules to a certain machine endpoint           |
-| `GET`  | `/rules`          | List current rules                                     |
-| `POST` | `/rules`          | Add new rule in execution time                         |
-
+| Method   | Route                       | Description                                            |
+|----------|-----------------------------|------------------------------------------------------- |
+| `POST`   | `/evaluate_all`             | Evaluate a machine against all stored rules            |
+| `POST`   | `/evaluate/{rule_id}`       | Evaluate rules to a certain machine endpoint           |
+| `POST`   | `/rules`                    | Add new rule in execution time                         |
+| `GET`    | `/rules`                    | List current rules                                     |
+| `PUT`    | `/rules/{rule_id}`          | Update a rule by its ID                                |
+| `DELETE` | `/rules/{rule_id}`          | Delete a rule by its ID                                |
 
 ## 📄 Project Structure
 
-```
+```bash
 BRE-study/
 │
 ├── .gitignore
 ├── requirements.txt             # Project dependencies
 ├── README.md                    # This document
+├── test_client.py               # Test script
 └── app
     ├── main.py                  # Main file which runs FastAPI
     ├── rules_engine.py          # Variables and actions used in the rules
