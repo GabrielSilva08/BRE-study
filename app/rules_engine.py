@@ -20,9 +20,9 @@ class InputVariables(BaseVariables):
 
 # Define the actions to be executed if some is triggered
 class OutputActions(BaseActions):
-    def __init__(self, endpoint_identifier: str):
+    def __init__(self, endpoint: DataEndpoint):
         self.cis_storage_email = "team_member@email.com"
-        self.endpoint = endpoint_identifier
+        self.endpoint = endpoint
         self.triggered_actions = [] # Keep track to return actions that were executed
 
     def send_email_notification(self, destination, message) -> None:
@@ -32,15 +32,27 @@ class OutputActions(BaseActions):
 
     @rule_action()
     def under_usage_resource(self) -> None:
-        self.send_email_notification("team_member", f'Under usage detected for endpoint "{self.endpoint}"')
+        self.send_email_notification("team_member", f'Under usage detected of {(self.endpoint.space_used * 100) / self.endpoint.space_quota} for endpoint "{self.endpoint.endpoint_identifier}"')
     
-    @rule_action(params={"inactive_days": FIELD_NUMERIC})
-    def inactive_resource(self, inactive_days) -> None:
-        self.send_email_notification("user", f'Endpoint "{self.endpoint}" has not been accessed in the last {inactive_days} days')
+    @rule_action()
+    def over_usage_resource(self) -> None:
+        self.send_email_notification("team_member", f'Over usage detected of {(self.endpoint.space_used * 100) / self.endpoint.space_quota} for endpoint "{self.endpoint.endpoint_identifier}"')
     
+    @rule_action()
+    def inactive_resource(self) -> None:
+        self.send_email_notification("user", f'Endpoint "{self.endpoint.endpoint_identifier}" has not been accessed in the last {(datetime.now() - self.endpoint.last_access).days} days')
+
+    @rule_action()
+    def inactive_under_usage_resource(self) -> None:
+        self.send_email_notification("user", f'Endpoint "{self.endpoint.endpoint_identifier}" has not been accessed in the last {(datetime.now() - self.endpoint.last_access).days} days and use {(self.endpoint.space_used * 100) / self.endpoint.space_quota} of available memory')
+    
+    @rule_action()
+    def excessive_usage(self) -> None:
+        self.send_email_notification("team_member", f'Endpoint "{self.endpoint.endpoint_identifier}" last access was {(datetime.now() - self.endpoint.last_access).days} and it is using {(self.endpoint.space_used * 100) / self.endpoint.space_quota} of available memory')
+
 def evaluate_rule(rule_json, data_endpoint):
     variables = InputVariables(data_endpoint)
-    actions = OutputActions(data_endpoint.endpoint_identifier)
+    actions = OutputActions(data_endpoint)
 
     result = run_all(rule_list=[rule_json], defined_variables=variables, defined_actions=actions)
 

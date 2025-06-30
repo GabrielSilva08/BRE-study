@@ -33,6 +33,16 @@ def populate_initial_rules():
             }
         },
         {
+            "name": "Over Usage Rule",
+            "rule_json": {
+                "conditions":{
+                    "any": [
+                        {"name": "current_usage_percentage", "operator":"greater_than", "value":90}
+                    ]},
+                "actions":[{"name": "over_usage_resource"}]
+            }
+        },
+        {
             "name": "Inactive Access Rule",
             "rule_json": {
                 "conditions": {
@@ -42,6 +52,34 @@ def populate_initial_rules():
                 },
                 "actions": [
                     {"name": "inactive_resource", "params": {"inactive_days": 90}}
+                ]
+            }
+        },
+        {
+            "name": "Inactive and Under Usage Rule",
+            "rule_json":{
+                "conditions":{
+                    "all":[
+                        {"name":"days_since_last_access", "operator":"greater_than_or_equal_to", "value": 60},
+                        {"name":"current_usage_percentage", "operator":"less_than_or_equal_to", "value": 5}
+                    ]
+                },
+                "actions": [
+                    {"name": "inactive_under_usage_resource"}
+                ]
+            }
+        },
+        {
+            "name":"Excessive Use Rule",
+            "rule_json":{
+                "conditions":{
+                    "all":[
+                        {"name":"days_since_last_access", "operator":"less_than_or_equal_to", "value": 7},
+                        {"name": "current_usage_percentage", "operator":"greater_than_or_equal_to", "value": 90}
+                    ]
+                },
+                "actions":[
+                    {"name": "excessive_usage"}
                 ]
             }
         }
