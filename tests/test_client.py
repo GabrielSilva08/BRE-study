@@ -43,7 +43,7 @@ endpoints = [
     }
 ]
 
-for rule_id in [1, 2]:  # rules ids
+for rule_id in [1, 2, 3, 4, 5]:  # rules ids
     print(f"\n--- Testing Rule ID: {rule_id} ---\n")
     for ep in endpoints:
         response = requests.post(f"{BASE_URL}/evaluate/{rule_id}", json=ep)
@@ -51,5 +51,4 @@ for rule_id in [1, 2]:  # rules ids
         print("Result:", response.json())
         # print("Status code:", response.status_code)
         # print("Raw response:", response.text)
-
         print()

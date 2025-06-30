@@ -57,7 +57,9 @@ BRE-study/
 ├── .gitignore
 ├── requirements.txt             # Project dependencies
 ├── README.md                    # This document
-├── test_client.py               # Test script
+├── tests                        # Test scripts
+│   ├── test_client.py              
+│   └── test_client1.py
 └── app
     ├── main.py                  # Main file which runs FastAPI
     ├── rules_engine.py          # Variables and actions used in the rules

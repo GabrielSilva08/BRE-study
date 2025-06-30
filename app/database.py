@@ -51,7 +51,7 @@ def populate_initial_rules():
                     ]
                 },
                 "actions": [
-                    {"name": "inactive_resource", "params": {"inactive_days": 90}}
+                    {"name": "inactive_resource"}
                 ]
             }
         },
